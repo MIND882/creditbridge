@@ -1,0 +1,6 @@
+# D:\msme-platform\.gitignore mein add karo
+.env
+.env.*
+*.env
+lender_api_key.txt
+backend/lender_api_key.txt
