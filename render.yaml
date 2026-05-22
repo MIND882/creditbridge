@@ -1,0 +1,47 @@
+services:
+  # ── Backend API ──────────────────────────────────────
+  - type: web
+    name: creditbridge-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: creditbridge-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: creditbridge-redis
+          type: redis
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: SUREPASS_API_TOKEN
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: CORS_ORIGINS
+        value: "https://creditbridge-msme.vercel.app,https://creditbridge-lender.vercel.app"
+
+  # ── Redis ────────────────────────────────────────────
+  - type: redis
+    name: creditbridge-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+
+databases:
+  # ── PostgreSQL ───────────────────────────────────────
+  - name: creditbridge-db
+    plan: free
+    databaseName: creditbridge
+    user: creditbridge
