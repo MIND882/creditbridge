@@ -1,0 +1,7 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  background: #080c10;
+  color: #e2e8f0;
+  min-height: 100vh;
+}

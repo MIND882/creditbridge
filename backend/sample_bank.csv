@@ -1,0 +1,31 @@
+date,description,amount,type,balance,category
+2024-05-01,Mehta Fabrics Payment,500000,CREDIT,1500000,customer_receipt
+2024-05-03,Supplier Payment Ravi Textiles,150000,DEBIT,1350000,supplier_payment
+2024-05-07,Sharma Exports Ltd,320000,CREDIT,1670000,customer_receipt
+2024-05-10,GST Payment,45000,DEBIT,1625000,tax_payment
+2024-05-15,Gupta Trading Co,280000,CREDIT,1905000,customer_receipt
+2024-05-18,Rent Payment,50000,DEBIT,1855000,rent
+2024-06-02,Mehta Fabrics Payment,550000,CREDIT,2405000,customer_receipt
+2024-06-05,Supplier Payment,200000,DEBIT,2205000,supplier_payment
+2024-06-10,Kumar Industries,410000,CREDIT,2615000,customer_receipt
+2024-06-15,GST Payment,52000,DEBIT,2563000,tax_payment
+2024-06-20,Jain Brothers,300000,CREDIT,2863000,customer_receipt
+2024-07-01,Mehta Fabrics Payment,480000,CREDIT,3343000,customer_receipt
+2024-07-08,Supplier Payment,175000,DEBIT,3168000,supplier_payment
+2024-07-12,Sharma Exports Ltd,350000,CREDIT,3518000,customer_receipt
+2024-07-18,Salary Payment,120000,DEBIT,3398000,salary
+2024-07-22,Patel Traders,290000,CREDIT,3688000,customer_receipt
+2024-08-01,Mehta Fabrics Payment,520000,CREDIT,4208000,customer_receipt
+2024-08-06,GST Payment,58000,DEBIT,4150000,tax_payment
+2024-08-10,Kumar Industries,380000,CREDIT,4530000,customer_receipt
+2024-08-15,Supplier Payment,190000,DEBIT,4340000,supplier_payment
+2024-08-20,Gupta Trading Co,310000,CREDIT,4650000,customer_receipt
+2024-09-02,Mehta Fabrics Payment,560000,CREDIT,5210000,customer_receipt
+2024-09-05,Salary Payment,120000,DEBIT,5090000,salary
+2024-09-10,Jain Brothers,420000,CREDIT,5510000,customer_receipt
+2024-09-15,Rent Payment,50000,DEBIT,5460000,rent
+2024-09-20,Kumar Industries,340000,CREDIT,5800000,customer_receipt
+2024-10-01,Mehta Fabrics Payment,600000,CREDIT,6400000,customer_receipt
+2024-10-08,Supplier Payment,220000,DEBIT,6180000,supplier_payment
+2024-10-12,Sharma Exports Ltd,390000,CREDIT,6570000,customer_receipt
+2024-10-18,GST Payment,65000,DEBIT,6505000,tax_payment
