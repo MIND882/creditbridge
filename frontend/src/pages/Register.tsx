@@ -11,8 +11,7 @@ const T = {
   yellow: "#EF9F27", yellowBg: "rgba(239,159,39,0.10)",
 }
 
-const API_BASE = "http://127.0.0.1:8000/v1"
-
+const API_BASE = `${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/v1`
 type KYCStatus = "idle" | "loading" | "verified" | "failed"
 
 // ─── KYC Badge ────────────────────────────────────────────────────────────────
