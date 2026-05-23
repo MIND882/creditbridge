@@ -5,7 +5,6 @@ import { useAuthStore } from '../store/authStore'
 import { useBusinessStore } from '../store/businessStore'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
-// ─── Theme ────────────────────────────────────────────────────────────────────
 const T = {
   bg:      "#0a0a0f",
   surface: "#0f0f14",
@@ -20,7 +19,6 @@ const T = {
   yellow:  "#EF9F27",
 };
 
-// ─── Sidebar Nav Config ───────────────────────────────────────────────────────
 const NAV_ITEMS = [
   { path: "/dashboard",              icon: "◈",  label: "Dashboard"     },
   { path: "/dashboard/invoices",     icon: "⧉",  label: "Invoices"      },
@@ -31,7 +29,6 @@ const NAV_ITEMS = [
   { path: "/dashboard/profile",      icon: "◉",  label: "Profile"       },
 ];
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
 export function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,7 +54,6 @@ export function Sidebar() {
       top: 0,
       zIndex: 100,
     }}>
-      {/* Logo + collapse */}
       <div style={{ padding: collapsed ? "1.2rem 0" : "1.2rem 1rem", display: "flex", alignItems: "center", justifyContent: collapsed ? "center" : "space-between", borderBottom: `0.5px solid ${T.border}` }}>
         {!collapsed && (
           <span style={{ fontSize: 12, letterSpacing: "0.12em", color: T.textSub, textTransform: "uppercase", fontWeight: 500 }}>CreditBridge</span>
@@ -67,32 +63,21 @@ export function Sidebar() {
         </button>
       </div>
 
-      {/* Nav links */}
       <nav style={{ flex: 1, padding: "0.75rem 0" }}>
         {NAV_ITEMS.map(item => {
           const active = isActive(item.path);
           return (
             <Link key={item.path} to={item.path} style={{ textDecoration: "none" }}>
               <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
+                display: "flex", alignItems: "center", gap: 10,
                 padding: collapsed ? "10px 0" : "10px 1rem",
                 justifyContent: collapsed ? "center" : "flex-start",
-                margin: "1px 6px",
-                borderRadius: 8,
+                margin: "1px 6px", borderRadius: 8,
                 background: active ? T.greenBg : "transparent",
                 color: active ? T.green : T.textSub,
-                fontSize: 13,
-                fontWeight: active ? 500 : 400,
-                transition: "all 0.15s",
-                cursor: "pointer",
-                position: "relative",
-              }}
-                onMouseEnter={e => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
-                onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}
-              >
-                {/* Active indicator */}
+                fontSize: 13, fontWeight: active ? 500 : 400,
+                transition: "all 0.15s", cursor: "pointer", position: "relative",
+              }}>
                 {active && <div style={{ position: "absolute", left: -6, top: "50%", transform: "translateY(-50%)", width: 3, height: 18, background: T.green, borderRadius: 2 }} />}
                 <span style={{ fontSize: 15, width: 18, textAlign: "center", flexShrink: 0 }}>{item.icon}</span>
                 {!collapsed && <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.label}</span>}
@@ -102,11 +87,11 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom: sign out */}
       <div style={{ borderTop: `0.5px solid ${T.border}`, padding: collapsed ? "0.75rem 0" : "0.75rem 1rem" }}>
         <button onClick={() => { logout(); navigate('/'); }} style={{
-          width: "100%", display: "flex", alignItems: "center", gap: 10, justifyContent: collapsed ? "center" : "flex-start",
-          background: "none", border: "none", cursor: "pointer", color: T.muted, fontSize: 12, padding: collapsed ? "8px 0" : "8px 0",
+          width: "100%", display: "flex", alignItems: "center", gap: 10,
+          justifyContent: collapsed ? "center" : "flex-start",
+          background: "none", border: "none", cursor: "pointer", color: T.muted, fontSize: 12, padding: "8px 0",
         }}>
           <span style={{ fontSize: 14 }}>⎋</span>
           {!collapsed && <span>Sign out</span>}
@@ -116,7 +101,6 @@ export function Sidebar() {
   );
 }
 
-// ─── Shell (Sidebar + Page content) ──────────────────────────────────────────
 export function DashboardShell() {
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: T.bg }}>
@@ -128,7 +112,6 @@ export function DashboardShell() {
   );
 }
 
-// ─── Cash Flow Data ───────────────────────────────────────────────────────────
 const cashFlowData = [
   { month: 'May', credits: 38, debits: 14 },
   { month: 'Jun', credits: 42, debits: 16 },
@@ -144,22 +127,50 @@ const cashFlowData = [
   { month: 'Apr', credits: 40, debits: 15 },
 ];
 
-// ─── Dashboard Home Page ──────────────────────────────────────────────────────
 export default function Dashboard() {
+  const navigate = useNavigate()
   const { business_id } = useAuthStore();
   const { scoreData, setScoreData } = useBusinessStore();
-  const [loading, setLoading] = useState(!scoreData);
+  const [loading, setLoading]   = useState(true);
+  const [noData,  setNoData]    = useState(false);
   const [accepting, setAccepting] = useState<string | null>(null);
-  const [accepted, setAccepted] = useState<string | null>(null);
+  const [accepted,  setAccepted]  = useState<string | null>(null);
 
   useEffect(() => {
-    if (!scoreData && business_id) {
-      getScore(business_id)
-        .then(r => setScoreData(r.data))
-        .catch(() => computeScore(business_id!).then(r => setScoreData(r.data)))
-        .finally(() => setLoading(false));
-    } else { setLoading(false); }
-  }, []);
+    if (!business_id) {
+      // Not logged in — redirect to login
+      navigate('/')
+      return
+    }
+
+    if (scoreData) {
+      setLoading(false)
+      return
+    }
+
+    // Try GET score first
+    getScore(business_id)
+      .then(r => {
+        if (r.data && r.data.score) {
+          setScoreData(r.data)
+        } else {
+          setNoData(true)
+        }
+      })
+      .catch(() => {
+        // GET failed — try compute
+        computeScore(business_id)
+          .then(r => {
+            if (r.data && r.data.score) {
+              setScoreData(r.data)
+            } else {
+              setNoData(true)
+            }
+          })
+          .catch(() => setNoData(true))
+      })
+      .finally(() => setLoading(false))
+  }, [business_id])
 
   const handleAccept = async (offer: any) => {
     setAccepting(offer.lender);
@@ -171,21 +182,58 @@ export default function Dashboard() {
     finally { setAccepting(null); }
   };
 
+  // ── Loading ──────────────────────────────────────────
   if (loading) return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.muted, fontSize: 13 }}>
-      Computing your score...
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.muted, fontSize: 13, background: T.bg }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 24, marginBottom: 12 }}>⏳</div>
+        <div>Score load ho raha hai...</div>
+      </div>
     </div>
   );
 
-  const score = scoreData!;
+  // ── No Data — bank CSV upload karo ──────────────────
+  if (noData || !scoreData) return (
+    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+      <div style={{ maxWidth: 420, textAlign: 'center' }}>
+        <div style={{ fontSize: 40, marginBottom: 16 }}>📊</div>
+        <div style={{ fontSize: 18, fontWeight: 500, color: T.text, marginBottom: 8 }}>
+          Score ready nahi hai
+        </div>
+        <div style={{ fontSize: 13, color: T.muted, lineHeight: 1.7, marginBottom: 24 }}>
+          Pehle bank statement upload karo. Score automatically calculate ho jayega.
+        </div>
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <Link to="/upload" style={{
+            padding: '10px 22px', background: T.green, color: '#0a0a0f',
+            borderRadius: 8, fontSize: 13, fontWeight: 500, textDecoration: 'none',
+          }}>
+            📄 Bank CSV Upload karo
+          </Link>
+          <button
+            onClick={() => { setLoading(true); setNoData(false); window.location.reload(); }}
+            style={{
+              padding: '10px 22px', background: 'transparent', color: T.textSub,
+              border: `0.5px solid ${T.border2}`, borderRadius: 8, fontSize: 13, cursor: 'pointer',
+            }}
+          >
+            🔄 Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ── Score loaded ─────────────────────────────────────
+  const score = scoreData;
   const gradeColor = score.score >= 750 ? T.green : score.score >= 650 ? T.yellow : T.red;
 
   const subScores = [
-    { label: 'Cash flow',            value: score.cash_flow_score || 0 },
-    { label: 'Payment discipline',   value: score.payment_discipline_score || 0 },
-    { label: 'GST compliance',       value: score.gst_compliance_score || 0 },
-    { label: 'Revenue consistency',  value: score.revenue_growth_score || 0 },
-    { label: 'Vintage',              value: score.business_vintage_score || 0 },
+    { label: 'Cash flow',           value: score.cash_flow_score || 0 },
+    { label: 'Payment discipline',  value: score.payment_discipline_score || 0 },
+    { label: 'GST compliance',      value: score.gst_compliance_score || 0 },
+    { label: 'Revenue consistency', value: score.revenue_growth_score || 0 },
+    { label: 'Vintage',             value: score.business_vintage_score || 0 },
   ];
 
   const loanOffers = [
@@ -197,7 +245,7 @@ export default function Dashboard() {
   return (
     <div style={{ padding: '1.5rem', maxWidth: 960, margin: '0 auto' }}>
 
-      {/* Quick nav pills (top) */}
+      {/* Quick nav pills */}
       <div style={{ display: "flex", gap: 8, marginBottom: "1.5rem", flexWrap: "wrap" }}>
         {[
           { to: "/dashboard/invoices",   label: "📄 Invoices" },
@@ -208,11 +256,10 @@ export default function Dashboard() {
         ].map(item => (
           <Link key={item.to} to={item.to} style={{ textDecoration: "none" }}>
             <div style={{
-              padding: "6px 14px", borderRadius: 20, fontSize: 12, border: `0.5px solid ${T.border2}`,
-              background: "transparent", color: T.textSub, cursor: "pointer", transition: "all 0.15s",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = T.green; e.currentTarget.style.color = T.green; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = T.border2; e.currentTarget.style.color = T.textSub; }}>
+              padding: "6px 14px", borderRadius: 20, fontSize: 12,
+              border: `0.5px solid ${T.border2}`, background: "transparent",
+              color: T.textSub, cursor: "pointer",
+            }}>
               {item.label}
             </div>
           </Link>
@@ -222,7 +269,7 @@ export default function Dashboard() {
       {/* Main grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
 
-        {/* Credit Score card */}
+        {/* Credit Score */}
         <div style={{ background: T.surface, border: `0.5px solid ${T.border}`, borderRadius: 12, padding: '1.25rem', textAlign: 'center', gridRow: 'span 2' }}>
           <div style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '1rem' }}>Credit score</div>
           <div style={{ fontSize: 64, fontWeight: 500, color: gradeColor, lineHeight: 1 }}>{score.score}</div>
@@ -250,13 +297,13 @@ export default function Dashboard() {
 
         {/* Bank Summary */}
         <div style={{ background: T.surface, border: `0.5px solid ${T.border}`, borderRadius: 12, padding: '1.25rem', gridColumn: 'span 2' }}>
-          <div style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '1rem' }}>Bank summary · HDFC XXXX4521</div>
+          <div style={{ fontSize: 10, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '1rem' }}>Bank summary</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10 }}>
             {[
               ['Avg monthly credits', '₹40.3L', T.green],
-              ['Avg monthly balance', '₹12L', T.text],
-              ['Bounce count', '0', T.green],
-              ['Recommended limit', `₹${(score.recommended_limit / 100000).toFixed(0)}L`, T.text],
+              ['Avg monthly balance', '₹12L',   T.text],
+              ['Bounce count',        '0',       T.green],
+              ['Recommended limit',   `₹${((score.recommended_limit || 0) / 100000).toFixed(0)}L`, T.text],
             ].map(([label, val, color]) => (
               <div key={label as string} style={{ background: T.bg, borderRadius: 8, padding: '0.75rem' }}>
                 <div style={{ fontSize: 10, color: T.muted, marginBottom: 6 }}>{label}</div>
@@ -275,7 +322,7 @@ export default function Dashboard() {
               <YAxis tick={{ fontSize: 10, fill: T.muted }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ background: '#111', border: `0.5px solid ${T.border2}`, borderRadius: 6, fontSize: 12 }} />
               <Bar dataKey="credits" fill={T.green} radius={[2, 2, 0, 0]} name="Credits" />
-              <Bar dataKey="debits" fill={T.red} opacity={0.4} radius={[2, 2, 0, 0]} name="Debits" />
+              <Bar dataKey="debits"  fill={T.red}   opacity={0.4} radius={[2, 2, 0, 0]} name="Debits" />
             </BarChart>
           </ResponsiveContainer>
         </div>
