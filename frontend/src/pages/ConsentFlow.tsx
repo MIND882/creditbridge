@@ -13,19 +13,28 @@ export default function ConsentFlow() {
   const [loading, setLoading] = useState(false)
 
   const handleStart = async () => {
-    setLoading(true)
-    try {
-      await initiateConsent(business_id!, phone!)
-      setStep('fetching')
-      await fetchData(business_id!)
-      setStep('scoring')
-      const res = await computeScore(business_id!)
-      setScoreData(res.data)
-      navigate('/dashboard')
-    } catch (e) {
-      console.error(e)
-    } finally { setLoading(false) }
-  }
+  setLoading(true)
+  try {
+    const consentRes = await initiateConsent(business_id!, phone!)
+    
+    // Agar CSV required hai toh CSV upload pe bhejo
+    if (consentRes.data?.status === 'csv_required') {
+      navigate('/upload')
+      return
+    }
+    
+    setStep('fetching')
+    await fetchData(business_id!)
+    setStep('scoring')
+    const res = await computeScore(business_id!)
+    setScoreData(res.data)
+    navigate('/dashboard')
+  } catch (e) {
+    console.error(e)
+    // Bank data nahi hai toh CSV upload pe bhejo
+    navigate('/upload')
+  } finally { setLoading(false) }
+}
 
   const steps = [
     { key: 'consent', label: 'Share bank data', desc: 'Securely connect via RBI-licensed Account Aggregator' },
