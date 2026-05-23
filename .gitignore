@@ -4,3 +4,4 @@
 *.env
 lender_api_key.txt
 backend/lender_api_key.txt
+.vercel
