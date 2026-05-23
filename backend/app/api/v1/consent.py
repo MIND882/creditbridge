@@ -81,7 +81,7 @@ async def initiate_consent(
     if not existing:
         consent = Consent(
             business_id=uuid.UUID(payload.business_id),
-            aa_consent_id=f"csv_{payload.business_id[:8]}",
+            aa_consent_id=f"csv_{uuid.uuid4().hex[:8]}",
             consent_types=["TRANSACTIONS"],
             data_date_from=datetime.utcnow() - timedelta(days=365),
             data_date_to=datetime.utcnow(),
