@@ -5,6 +5,7 @@ Docs: https://www.perfios.com/aa-developer
 """
 import httpx
 import os
+import uuid
 from typing import Optional
 from app.config import Settings
 from app.utils.logger import get_logger
@@ -116,7 +117,7 @@ async def fetch_bank_transactions(
 # ─── Mock Fallback ────────────────────────────────────────────────────────────
 def _mock_consent(business_id: str) -> dict:
     return {
-        "consent_id":  f"mock_consent_{business_id[:8]}",
+        "consent_id": f"mock_consent_{uuid.uuid4().hex[:8]}",
         "consent_url": "https://sandbox.perfios.com/mock-consent",
         "status":      "mock",
         "note":        "Perfios not configured — mock response",
